@@ -2,172 +2,278 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Control de Unidades R-O14</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control x Unidad - 3dF Desarrollos (R-014)</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1e3a8a">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
-    :root {
-      --primary: #1e3a8a;
-      --bg: #f1f5f9;
-      --card: #ffffff;
-      --border: #cbd5e1;
-      --text: #0f172a;
-      --muted: #64748b;
-      --ok: #16a34a;
-      --obs: #ea580c;
+    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+    body { margin: 0; background: #e5e7eb; color: #000; padding-bottom: 70px; }
+
+    /* Contenedor tipo Hoja Excel */
+    .sheet-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-right: 3px solid #000080;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 80px; }
-    
-    /* Encabezado R-O14 */
-    .header { background: var(--primary); color: white; padding: 14px 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    .header-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; opacity: 0.9; margin-bottom: 4px; }
-    .header h1 { margin: 0; font-size: 16px; letter-spacing: 0.3px; }
-    
-    /* Datos de Unidad */
-    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--card); padding: 12px 16px; border-bottom: 1px solid var(--border); }
-    .meta-field { display: flex; flex-direction: column; }
-    .meta-field label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
-    .meta-field input { border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 14px; margin-top: 2px; }
-    
-    /* Dashboard KPI */
-    .kpi-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px; }
-    .kpi-card { background: var(--card); border-radius: 8px; padding: 10px; text-align: center; border: 1px solid var(--border); }
-    .kpi-val { font-size: 20px; font-weight: 800; color: var(--primary); }
-    .kpi-lbl { font-size: 11px; color: var(--muted); font-weight: 600; }
 
-    /* Pestañas de Hojas Excel */
-    .tabs { display: flex; overflow-x: auto; gap: 6px; padding: 0 16px 10px; border-bottom: 1px solid var(--border); }
-    .tab-btn { background: #e2e8f0; border: none; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; cursor: pointer; }
-    .tab-btn.active { background: var(--primary); color: white; }
+    /* ENCABEZADO OFICIAL 3dF DESARROLLOS */
+    .header-black {
+      background: #000000;
+      color: #ffffff;
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      padding: 10px 14px;
+      align-items: center;
+    }
+    .logo-box { display: flex; flex-direction: column; justify-content: center; line-height: 1; }
+    .logo-3df { font-size: 36px; font-weight: 400; letter-spacing: -1px; }
+    .logo-sub { font-size: 9px; letter-spacing: 0.8px; font-weight: bold; margin-top: 2px; }
+    
+    .header-info { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+    .header-title { text-align: center; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .header-meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: bold;
+      padding-right: 20px;
+    }
 
-    /* Secciones y Renglones */
-    .section { margin: 12px 16px; background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
-    .section-title { background: #e2e8f0; padding: 10px 12px; font-weight: 800; font-size: 13px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
-    .sub-badges { display: flex; gap: 4px; flex-wrap: wrap; }
-    .badge { background: white; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: var(--text); }
-    
-    .task-row { border-top: 1px solid var(--border); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
-    .task-row.done { background: #f0fdf4; }
-    .task-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .task-text { font-size: 13px; line-height: 1.35; flex: 1; }
-    .task-who { font-size: 10px; font-weight: 700; color: var(--muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
-    
-    .controls { display: flex; gap: 8px; align-items: center; }
-    .chk-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: white; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .chk-btn.ok.active { background: var(--ok); color: white; border-color: var(--ok); }
-    .chk-btn.obs.active { background: var(--obs); color: white; border-color: var(--obs); }
-    
-    /* Espacio para carga de texto por renglón (como en el Excel) */
-    .note-input { width: 100%; border: 1px dashed var(--border); border-radius: 6px; padding: 6px 8px; font-size: 12px; background: #fafafa; resize: vertical; min-height: 34px; }
-    .note-input:focus { outline: none; border-color: var(--primary); background: white; }
+    /* Filas de UNIDAD / CONTROLADO POR / FECHA */
+    .meta-table { width: 100%; border-collapse: collapse; }
+    .meta-table td { border: 1px solid #d1d5db; padding: 5px 8px; font-size: 13px; font-weight: bold; }
+    .meta-col-spacer { width: 34px; background: #fff; }
+    .meta-input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-weight: normal;
+      width: 65%;
+      background: transparent;
+      color: #000;
+    }
+    .meta-input:focus { background: #fef9c3; }
+
+    /* Barra TAREA recuadrada */
+    .tarea-banner-wrap { display: flex; border-bottom: 1px solid #d1d5db; }
+    .tarea-banner {
+      flex: 1;
+      border: 1.5px solid #000000;
+      text-align: center;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 3px;
+      margin: 4px 8px 4px 0;
+    }
+
+    /* Mini Dashboard discreto */
+    .mini-dash {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      padding: 6px 12px;
+      border-bottom: 1px solid #cbd5e1;
+      font-size: 12px;
+    }
+    .dash-stats span { margin-right: 12px; font-weight: bold; }
+
+    /* TABLA EXACTA DE EXCEL */
+    .excel-grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .excel-grid td {
+      border: 1px solid #9ca3af;
+      padding: 4px 6px;
+      font-size: 12px;
+      vertical-align: middle;
+      word-wrap: break-word;
+    }
+    .col-amb { width: 72px; text-align: center; }
+    .col-task { width: auto; }
+
+    /* Encabezado de Sección (Ej: INGRESO | LIVING | COMEDOR | INGRESO / LIVING-COMEDOR) */
+    .sec-header td {
+      background: #d9d9d9;
+      font-weight: bold;
+      font-size: 11px;
+      text-transform: uppercase;
+      border-top: 2px solid #000;
+      border-bottom: 1.5px solid #000;
+    }
+    .sec-header td.col-task { text-align: left; padding-left: 8px; }
+
+    /* Celdas editables */
+    [contenteditable="true"] { outline: none; cursor: text; }
+    [contenteditable="true"]:focus { background: #fef9c3; }
+
+    /* Renglones de tarea y 3 renglones de carga de texto */
+    .task-title-row td { background: #f9fafb; font-weight: 500; }
+    .blank-line-row td { height: 22px; background: #ffffff; }
+    .note-cell {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 12px;
+      background: transparent;
+      color: #1e3a8a;
+    }
+    .note-cell:focus { background: #fef9c3; }
+
+    /* Check rápido en celdas de ambiente */
+    .amb-cell-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+    .amb-chk { width: 14px; height: 14px; cursor: pointer; accent-color: #000; }
+    .amb-mini-txt { width: 38px; border: none; font-size: 11px; text-align: center; background: transparent; }
+
+    /* Botón agregar renglón por sección */
+    .add-row-bar td { background: #f1f5f9; text-align: right; padding: 4px 8px; }
+    .btn-add-row {
+      background: #ffffff;
+      border: 1px solid #000;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 8px;
+      cursor: pointer;
+    }
+    .btn-add-row:hover { background: #000; color: #fff; }
+    .btn-del-task {
+      float: right;
+      border: none;
+      background: transparent;
+      color: #dc2626;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 11px;
+    }
 
     /* Barra flotante inferior */
-    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 10px; justify-content: space-between; z-index: 100; }
-    .action-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
-    .btn-export { background: var(--ok); color: white; }
-    .btn-clear { background: #fee2e2; color: #b91c1c; }
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #000000;
+      color: #fff;
+      padding: 8px 14px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      z-index: 100;
+    }
+    .bottom-bar button {
+      padding: 8px 14px;
+      border: 1px solid #fff;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-csv { background: #16a34a; color: #fff; border-color: #16a34a !important; }
+    .btn-print { background: #ffffff; color: #000; }
+    .btn-reset { background: #991b1b; color: #fff; border-color: #991b1b !important; }
 
-    /* Tabla Matriz Control General */
-    .matrix-wrap { overflow-x: auto; }
-    table.matrix { width: 100%; border-collapse: collapse; font-size: 12px; }
-    table.matrix th, table.matrix td { border: 1px solid var(--border); padding: 6px; text-align: center; }
-    table.matrix td:first-child { text-align: left; min-width: 220px; position: sticky; left: 0; background: white; z-index: 2; }
-    table.matrix th:first-child { position: sticky; left: 0; background: #e2e8f0; z-index: 3; }
+    @media print {
+      .bottom-bar, .mini-dash, .add-row-bar, .btn-del-task { display: none !important; }
+      body { background: #fff; padding: 0; }
+      .sheet-container { box-shadow: none; max-width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .col-amb { width: 52px; font-size: 9px !important; }
+      .amb-mini-txt { display: none; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div class="header-top">
-      <span>CÓDIGO: R-O14 | VERSIÓN: 03</span>
-      <span>FECHA DOC: 22/06/2022</span>
+<div class="sheet-container">
+  <!-- ENCABEZADO IDÉNTICO A LA IMAGEN -->
+  <div class="header-black">
+    <div class="logo-box">
+      <div class="logo-3df" contenteditable="true" id="edit-logo">3dF</div>
+      <div class="logo-sub" contenteditable="true" id="edit-sub">DESARROLLOS</div>
     </div>
-    <h1>CONTROL Y PUESTA A PUNTO DE UNIDADES</h1>
-  </div>
-
-  <div class="meta-grid">
-    <div class="meta-field">
-      <label>Unidad</label>
-      <input type="text" id="meta-unidad" placeholder="Ej: 2B" oninput="saveMeta()">
-    </div>
-    <div class="meta-field">
-      <label>Controlado Por</label>
-      <input type="text" id="meta-inspector" placeholder="Nombre y Apellido" oninput="saveMeta()">
-    </div>
-    <div class="meta-field" style="grid-column: span 2;">
-      <label>Fecha de Control</label>
-      <input type="date" id="meta-fecha" oninput="saveMeta()">
+    <div class="header-info">
+      <div class="header-title" contenteditable="true" id="edit-title">CONTROL Y PUESTA A PUNTO DE UNIDADES</div>
+      <div class="header-meta-row">
+        <span contenteditable="true" id="edit-code">R-014</span>
+        <span contenteditable="true" id="edit-ver">VERSIÓN: 03</span>
+        <span contenteditable="true" id="edit-docdate">FECHA: 22/06/2022</span>
+      </div>
     </div>
   </div>
 
-  <div class="kpi-bar">
-    <div class="kpi-card">
-      <div class="kpi-val" id="kpi-pct">0%</div>
-      <div class="kpi-lbl">AVANCE</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-val" id="kpi-ok" style="color: var(--ok);">0</div>
-      <div class="kpi-lbl">APROBADOS</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-val" id="kpi-obs" style="color: var(--obs);">0</div>
-      <div class="kpi-lbl">CON OBS.</div>
-    </div>
+  <!-- FILAS DE DATOS DE UNIDAD -->
+  <table class="meta-table">
+    <tr>
+      <td class="meta-col-spacer"></td>
+      <td class="meta-col-spacer"></td>
+      <td class="meta-col-spacer"></td>
+      <td colspan="2">UNIDAD: <input type="text" class="meta-input" id="meta-unidad" oninput="saveAll()"></td>
+    </tr>
+    <tr>
+      <td class="meta-col-spacer"></td>
+      <td class="meta-col-spacer"></td>
+      <td class="meta-col-spacer"></td>
+      <td style="width: 55%;">CONTROLADO POR: <input type="text" class="meta-input" id="meta-inspector" oninput="saveAll()"></td>
+      <td>FECHA: <input type="text" class="meta-input" id="meta-fecha" placeholder="dd/mm/aaaa" oninput="saveAll()"></td>
+    </tr>
+  </table>
+
+  <!-- RECUADRO TAREA -->
+  <div class="tarea-banner-wrap">
+    <div style="width: 216px;" class="col-amb-spacer"></div>
+    <div class="tarea-banner" contenteditable="true">TAREA</div>
   </div>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('hoja1', this)">1. Planilla Estándar</button>
-    <button class="tab-btn" onclick="switchTab('hoja2', this)">2. Planilla Detallada (Sur/Norte)</button>
-    <button class="tab-btn" onclick="switchTab('hoja3', this)">3. Control General (1A-4C)</button>
+  <!-- RESUMEN INTERACTIVO -->
+  <div class="mini-dash">
+    <div class="dash-stats">
+      <span>Avance: <b id="stat-pct">0%</b></span>
+      <span>Tildados: <b id="stat-ok">0</b></span>
+      <span>Notas cargadas: <b id="stat-notes">0</b></span>
+    </div>
+    <div style="font-size: 11px; color: #475569;">* Toca cualquier texto para editarlo</div>
   </div>
 
-  <div id="app-content"></div>
+  <!-- CUERPO DE LA PLANILLA -->
+  <div id="grid-mount"></div>
+</div>
 
-  <div class="bottom-bar">
-    <button class="action-btn btn-clear" onclick="resetUnit()">Limpiar Unidad</button>
-    <button class="action-btn btn-export" onclick="exportCSV()">Descargar Excel (CSV)</button>
-  </div>
+<div class="bottom-bar">
+  <button class="btn-print" onclick="window.print()">Imprimir / PDF</button>
+  <button class="btn-csv" onclick="exportCSV()">Exportar Excel (CSV)</button>
+  <button class="btn-reset" onclick="resetAll()">Reiniciar Planilla</button>
+</div>
 
 <script>
-// Bloques de tareas exactos del archivo Excel R-O14
-const TAREAS_LIVING = [
-  "Control de limpieza de pisos, vidrios y puertas (retirar restos de silicona y pintura)",
-  "Control de pintura: marca de pinceladas, aristas, buñas y correcta limpieza (Doble control sobre el ya realizado)",
-  "Control de cortineros: aristas, alineación de cielorraso con dintel aberturas",
-  "Control de pastinas pisos (que estén bien llenas, prolijas)",
-  "Control de rayaduras / cachaduras en pisos y revestimientos",
-  "Control de zócalos de madera flojos / desplomados en las uniones",
-  "Control que las llaves y los tomas estén firmes y alineados / Control de funcionamiento de tomas y llaves",
-  "Control de correcta apertura / regulación / Lubricación de Puertas, Ventanas y Postigos",
-  "Control de rayaduras / Óxido / Pintura saltada de Puertas, Ventanas y Postigos",
-  "Colocar topetinas / topes de piso en Puertas, Ventanas y Postigos"
-];
-
-const TAREAS_DORMITORIO = [
-  "Control de limpieza de pisos, vidrios y puertas (retirar restos de silicona y pintura)",
-  "Control de pintura: marca de pinceladas, aristas, buñas y correcta limpieza (Doble control sobre el ya realizado)",
-  "Control de cortineros: aristas, alineación de cielorraso con dintel aberturas",
-  "Control apertura/lubricación de puertas de placares / cajones internos / pegados de felpas",
-  "Control de regulación de puertas a plomo",
-  "Control de zócalos de madera flojos / desplomados en las uniones",
-  "Control que las llaves y los tomas estén firmes y alineados / Control de funcionamiento de tomas y llaves",
-  "Control de correcta apertura / regulación / Lubricación de Puertas, Ventanas y Postigos",
-  "Control de rayaduras / Óxido / Pintura saltada de Puertas, Ventanas y Postigos",
-  "Colocar topetinas / topes de piso en Puertas, Ventanas y Postigos"
-];
-
-const TAREAS_COCINA = [
-  "Control de limpieza de pisos, vidrios y puertas (retirar restos de silicona y pintura)",
-  "Control de los desagües dejando correr abundante agua (bañeras a sección llena), incluyendo lavarropas",
-  "Controlar que todas las piletas de patios tengan los sifones",
-  "Control de pintura: marca de pinceladas, aristas, buñas y correcta limpieza (Doble control sobre el ya realizado)",
-  "Control de pastinas pisos y revestimientos (que estén bien llenas, prolijas)",
-  "Control de rayaduras / cachaduras en pisos y revestimientos, mesadas, muebles",
-  "Control que las llaves y los tomas estén firmes y alineados / Control de funcionamiento de tomas y llaves",
-  "Control de mecheros atornillados en cocinas / anafes",
-  "Control de la lubricación de cajones y puertas de cocina-lavadero (bajo mesada, alacenas, escoberos)",
-  "Control de alineación/regulación de puertas de cocina-lavadero (bajo mesada, alacenas, escoberos)",
+const DEFAULT_DATA = [
+  {
+    cols: ["INGRESO", "LIVING", "COMEDOR"],
+    titulo: "INGRESO / LIVING-COMEDOR",
+    tareas: [
+      "Control de limpieza de pisos, vidrios y puertas (retirar restos de silicona y pintura)",
+      "Control de pintura: marca de pinceladas, aristas, buñas y correcta limpieza (Doble control sobre el ya realizado)",
+      "Control de cortineros: aristas, alineación de cielorraso con dintel aberturas",
+      "Control de pastinas pisos (que estén bien llenas, prolijas)",
+      "Control de rayaduras / cachaduras en pisos y revestimientos",
+      "Control de zócalos de madera flojos / desplomados en las uniones",
+      "Control que las llaves y los tomas estén firmes y alineados / Control de funcionamiento de tomas y llaves",
+      "Control de correcta apertura / regulación / Lubricación de Puertas, Ventanas y Postigos",
+      "Control de rayaduras / Óxido / Pintura saltada de Puertas, Ventanas y Postigos",
+      "Colocar topetinas / topes de piso en Puertas, Ventanas y Postigos"
+    ]
+  },
+  {
+    cols: ["suite", "D2", "D3"],
+    titulo: "DORMITORIOS",
+    tareas: [
+      "Control de limpieza de pisos, vidrios y puertas (retirar restos de silicona y pintura)",
+      "Control de pintura: marca de pinceladas, aristas, buñas y correcta limpieza (Doble control sobre el ya realizado)",
+      "Control de cortineros: aristas, alineación de cielorraso con dintel aberturas",
+      "Control apertura/lubricación de puertas de placares / cajones internos / pegados de felpas",
+      "Control de regulación de puertas a plomo",
+      "Control de zócalos de madera flojos / desplomados en las uniones",
