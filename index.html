@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control x Unidad - 3dF Desarrollos (R-014)</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+    body { margin: 0; background: #e5e7eb; color: #000; padding-bottom: 70px; }
+
+    .sheet-container {
+      max-width: 1050px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-right: 3px solid #000080;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+
+    /* ENCABEZADO OFICIAL 3dF DESARROLLOS */
+    .header-black {
+      background: #000000;
+      color: #ffffff;
+      display: grid;
+      grid-template-columns: 115px 1fr;
+      padding: 10px 14px;
+      align-items: center;
+    }
+    .logo-box { display: flex; flex-direction: column; justify-content: center; line-height: 1; }
+    .logo-3df { font-size: 36px; font-weight: 400; letter-spacing: -1px; }
+    .logo-sub { font-size: 9px; letter-spacing: 0.8px; font-weight: bold; margin-top: 2px; }
+    
+    .header-info { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+    .header-title { text-align: center; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .header-meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: bold;
+      padding-right: 20px;
+    }
+
+    /* Filas de UNIDAD / CONTROLADO POR / FECHA */
+    .meta-table { width: 100%; border-collapse: collapse; }
+    .meta-table td { border: 1px solid #d1d5db; padding: 5px 8px; font-size: 13px; font-weight: bold; }
+    .meta-col-spacer { width: 72px; background: #fff; }
+    .meta-input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-weight: normal;
+      width: 65%;
+      background: transparent;
+      color: #000;
+    }
+    .meta-input:focus { background: #fef9c3; }
+
+    /* Barra TAREA recuadrada */
+    .tarea-banner-wrap { display: flex; border-bottom: 1px solid #d1d5db; }
+    .col-amb-spacer { width: 216px; flex-shrink: 0; }
+    .tarea-banner {
+      flex: 1;
+      border: 1.5px solid #000000;
+      text-align: center;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 3px;
+      margin: 4px 8px 4px 0;
+    }
+
+    /* Mini Dashboard de progreso */
+    .mini-dash {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      padding: 6px 12px;
+      border-bottom: 1px solid #cbd5e1;
+      font-size: 12px;
+      gap: 8px;
+    }
+    .dash-stats span { margin-right: 14px; }
+
+    /* TABLA EXACTA DE EXCEL */
+    .excel-grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .excel-grid td {
+      border: 1px solid #9ca3af;
+      padding: 4px 6px;
+      font-size: 12px;
+      vertical-align: middle;
+      word-wrap: break-word;
+    }
+    .col-amb { width: 72px; text-align: center; }
+    .col-task { width: auto; }
+
+    /* Encabezado de Sección */
+    .sec-header td {
+      background: #d9d9d9;
+      font-weight: bold;
+      font-size: 11px;
+      text-transform: uppercase;
+      border-top: 2px solid #000;
+      border-bottom: 1.5px solid #000;
+    }
+    .sec-header td.col-task { text-align: left; padding-left: 8px; }
+
+    [contenteditable="true"] { outline: none; cursor: text; }
+    [contenteditable="true"]:focus { background: #fef9c3; }
+
+    /* Renglones de tarea y 3 renglones de carga de texto */
+    .task-title-row td { background: #f3f4f6; font-weight: 500; }
+    .blank-line-row td { height: 24px; background: #ffffff; }
+    .note-cell {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 12px;
+      background: transparent;
+      color: #000080;
+    }
+    .note-cell:focus { background: #fef9c3; }
+
+    /* Check y texto en celdas de ambiente */
+    .amb-cell-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .amb-chk { width: 15px; height: 15px; cursor: pointer; accent-color: #000; }
+    .amb-mini-txt { width: 38px; border: none; border-bottom: 1px dotted #ccc; font-size: 11px; text-align: center; background: transparent; }
+    .amb-mini-txt:focus { outline: none; background: #fef9c3; }
+
+    /* Botón agregar renglón */
+    .add-row-bar td { background: #f8fafc; text-align: right; padding: 5px 8px; }
+    .btn-add-row {
+      background: #ffffff;
+      border: 1px solid #000;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+    .btn-add-row:hover { background: #000; color: #fff; }
+    .btn-del-task {
+      float: right;
+      border: none;
+      background: transparent;
+      color: #dc2626;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    /* Barra flotante inferior */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #000000;
+      color: #fff;
+      padding: 8px 14px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      z-index: 100;
+    }
+    .bottom-bar button {
+      padding: 8px 14px;
+      border: 1px solid #fff;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-csv { background: #16a34a; color: #fff; border-color: #16a34a !important; }
+    .btn-print { background: #ffffff; color: #000; }
+    .btn-reset { background: #991b1b; color: #fff; border-color: #991b1b !important; }
+
+    @media print {
+      .bottom-bar, .mini-dash, .add-row-bar, .btn-del-task { display: none !important; }
+      body { background: #fff; padding: 0; }
+      .sheet-container { box-shadow: none; max-width: 100%; border: none; }
+    }
+    @media (max-width: 600px) {
+      .col-amb, .meta-col-spacer { width: 52px; font-size: 9px !important; }
+      .col-amb-spacer { width: 156px; }
+      .amb-mini-txt { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sheet-container">
+  <!-- ENCABEZADO IDÉNTICO A LA IMAGEN -->
+  <div class="header-black">
+    <div class="logo-box">
+      <div class="logo-3df" contenteditable="true" id="edit-logo" onblur="saveHeader()">3dF</div>
+      <div class="logo-sub" contenteditable="true" id="edit-sub" onblur="saveHeader()">DESARROLLOS</div>
+    </div>
+    <div class="header-info">
+      <div class="header-title" contenteditable="true" id="edit-title" onblur="saveHeader()">CONTROL Y PUESTA A PUNTO DE UNIDADES</div>
+      <div class="header-meta-row">
+        <span contenteditable="true" id="edit-code" onblur="saveHeader()">R-014</span>
+        <span contenteditable="true" id="edit-ver" onblur="saveHeader()">VERSIÓN: 03</span>
+        <span contenteditable="true" id="edit-docdate" onblur="saveHeader()">FECHA: 22/06/2022</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILAS DE DATOS DE UNIDAD -->
+  <table class="meta-table">
+    <tr>
+      <td class="meta-col-spacer"></td>
+      <td class="meta-col-spacer"></td>
+      <td class="meta-col-spacer"></td>
+      <td colspan="2">UNIDAD: <input type="text" class="meta-input" id="meta-unidad" placeholder="Escribir unidad..." oninput="saveAll()"></td>
+    </tr>
+    <tr>
+      <td class="meta-col-spacer"></td>
+      <td class="meta-col-spacer"></td>
+      <td class="meta-col-spacer"></td>
+      <td style="width: 55%;">CONTROLADO POR: <input type="text" class="meta-input" id="meta-inspector" placeholder="Escribir nombre..." oninput="saveAll()"></td>
+      <td>FECHA: <input type="text" class="meta-input" id="meta-fecha" placeholder="dd/mm/aaaa" oninput="saveAll()"></td>
+    </tr>
+  </table>
+
+  <!-- RECUADRO TAREA -->
+  <div class="tarea-banner-wrap">
+    <div class="col-amb-spacer"></div>
+    <div class="tarea-banner" contenteditable="true">TAREA</div>
+  </div>
+
+  <!-- RESUMEN INTERACTIVO -->
+  <div class="mini-dash">
+    <div class="dash-stats">
+      <span>Avance: <b id="stat-pct">0%</b></span>
+      <span>Tildados: <b id="stat-ok">0/0</b></span>
+      <span>Notas cargadas: <b id="stat-notes">0</b></span>
+    </div>
+    <div style="font-size: 11px; color: #475569;">Toca cualquier celda o texto para editar</div>
+  </div>
+
+  <!-- CUERPO DE LA PLANILLA -->
+  <div id="grid-mount"></div>
+</div>
+
+<div class="bottom-bar">
+  <button class="btn-print" onclick="window.print()">Imprimir / PDF</button>
+  <button class="btn-csv" onclick="exportCSV()">Exportar Excel (CSV)</button>
+  <button class="btn-reset" onclick="resetAll()">Reiniciar Planilla</button>
+</div>
+
+<script>
+const DEFAULT_DATA = [
+  {
+    cols: ["INGRESO", "LIVING", "COMEDOR"],
+    titulo: "INGRESO / LIVING-COMEDOR",
+    tareas: [
+      "Control de limpieza de pisos, vidrios y puertas (retirar restos de silicona y pintura)",
+      "Control de pintura: marca de pinceladas, aristas, buñas y correcta limpieza (Doble control sobre el ya realizado)",
+      "Control de cortineros: aristas, alineación de cielorraso con dintel aberturas",
+      "Control de pastinas pisos (que estén bien llenas, prolijas)",
+      "Control de rayaduras / cachaduras en pisos y revestimientos",
+      "Control de zócalos de madera flojos / desplomados en las uniones",
+      "Control que las llaves y los tomas estén firmes y alineados / Control de funcionamiento de tomas y llaves",
+      "Control de correcta apertura / regulación / Lubricación de Puertas, Ventanas y Postigos",
+      "Control de rayaduras / Óxido / Pintura saltada de Puertas, Ventanas y Postigos",
+      "Colocar topetinas / topes de piso en Puertas, Ventanas y Postigos"
+    ]
+  },
+  {
+    cols: ["suite", "D2", "D3"],
+    titulo: "DORMITORIOS",
+    tareas: [
+      "Control de limpieza de pisos, vidrios y puertas (retirar restos de silicona y pintura)",
